@@ -1,3 +1,16 @@
+# Extended March 13 2020, Brendan Chambers
+This project extends the existing Facebook command line tool for fetching ads data through the Ads Library API
+I have added functionality for search by impression_condition and a convenience notebook for running the command line tool.
+See the original project at  https://github.com/facebookresearch/Ad-Library-API-Script-Repository
+
+An access token is required, stored in a file titled config:
+secret_code="<access token>"
+
+Documentation from the original project begins below.
+________________________________________________________________________________________________
+
+
+
 # Ads-Library-API-Script-Repository
 Ads-Library-API-Script-Repository is a set of code examples to help user/researchers understand how the Facebook Ads Library API works. It also provides a simple command-line interface(CLI) for users to easily use the Facebook Ads Library API.
 
