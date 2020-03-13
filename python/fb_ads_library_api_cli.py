@@ -46,6 +46,15 @@ def get_parser():
         help="Filter by the current status of the ads at the moment the script runs",
     )
     parser.add_argument(
+        "--ad-type",
+        help="the library only supports political_and_issue_ads at this time",
+    )
+    parser.add_argument(
+        "--impression-condition",
+        help="has_impressions_last_30_days",
+    )
+    # todo search capability for bylines, publisher_platforms fields
+    parser.add_argument(
         "--after-date", help="Only return ads that started delivery after this date"
     )
     parser.add_argument("--batch-size", type=int, help="Batch size")
@@ -122,15 +131,22 @@ def main():
         api.search_page_ids = opts.search_page_ids
     if opts.ad_active_status:
         api.ad_active_status = opts.ad_active_status
+    if opts.ad_type:
+        api.ad_type = opts.ad_type
+    if opts.impression_condition:
+        api.impression_condition = opts.impression_condition
     if opts.batch_size:
         api.page_limit = opts.batch_size
     if opts.retry_limit:
         api.retry_limit = opts.retry_limit
     if opts.after_date:
         api.after_date = opts.after_date
+    
+    # request results from the Ads Library API as a generator to iterate over
     generator_ad_archives = api.generate_ad_archives()
+    
     if opts.action in get_operators():
-        get_operators()[opts.action](
+        get_operators()[opts.action](   # <-- call save to file, count, or user-defined operations
             generator_ad_archives, opts.args, is_verbose=opts.verbose
         )
     else:

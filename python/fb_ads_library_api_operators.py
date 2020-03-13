@@ -38,7 +38,7 @@ def count_ads(generator_ad_archives, args, is_verbose=False):
     print("Total number of ads match the query: {}".format(count))
 
 
-def save_to_file(generator_ad_archives, args, is_verbose=False):
+def save_to_file(generator_ad_archives, args, is_verbose=False, hideAccessToken=True):
     """
     Save all retrieved ad_archives to the file; each ad_archive will be
     stored in JSON format in a single line;
@@ -49,6 +49,13 @@ def save_to_file(generator_ad_archives, args, is_verbose=False):
         count = 0
         for ad_archives in generator_ad_archives:
             for data in ad_archives:
+                if hideAccessToken:  # bc - mask out access code by default
+                    try:
+                        url = data['ad_snapshot_url']
+                        url = url.split('access_token')[0] + 'access_code=HIDDEN_FOR_SECURITY'
+                        data['ad_snapshot_url'] = url
+                    except:
+                        pass  # if no ad_snapshot_url in data, no need to hide access_code
                 file.write(json.dumps(data))
                 file.write("\n")
             count += len(ad_archives)

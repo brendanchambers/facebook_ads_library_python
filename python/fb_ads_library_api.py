@@ -23,7 +23,10 @@ class FbAdsLibraryTraversal:
     default_url_pattern = (
         "https://graph.facebook.com/{}/ads_archive?access_token={}&"
         + "fields={}&search_terms={}&ad_reached_countries={}&search_page_ids={}&"
-        + "ad_active_status={}&limit={}"
+        + "ad_active_status={}&"
+        + "ad_type={}&"
+        + "impression_condition={}&"
+        + "limit={}"
     )
     default_api_version = "v4.0"
 
@@ -35,6 +38,8 @@ class FbAdsLibraryTraversal:
         country,
         search_page_ids="",
         ad_active_status="active",
+        ad_type="political_and_issue_ads",
+        impression_condition="has_impressions_lifetime",
         after_date="1970-01-01",
         page_limit=500,
         api_version=None,
@@ -48,6 +53,8 @@ class FbAdsLibraryTraversal:
         self.after_date = after_date
         self.search_page_ids = search_page_ids
         self.ad_active_status = ad_active_status
+        self.ad_type=ad_type,
+        self.impression_condition=impression_condition,
         self.page_limit = page_limit
         self.retry_limit = retry_limit
         if api_version is None:
@@ -64,23 +71,25 @@ class FbAdsLibraryTraversal:
             self.country,
             self.search_page_ids,
             self.ad_active_status,
+            self.ad_type,
+            self.impression_condition,
             self.page_limit,
         )
-        return self.__class__._get_ad_archives_from_url(
-            next_page_url, after_date=self.after_date, retry_limit=self.retry_limit
-        )
+        return self.__class__._get_ad_archives_from_url(next_page_url,
+                                                        after_date=self.after_date, 
+                                                        retry_limit=self.retry_limit)
 
     @staticmethod
-    def _get_ad_archives_from_url(
-        next_page_url, after_date="1970-01-01", retry_limit=3
-    ):
+    def _get_ad_archives_from_url(next_page_url,
+                                  after_date="1970-01-01",
+                                  retry_limit=3):
         last_error_url = None
         last_retry_count = 0
         start_time_cutoff_after = datetime.strptime(
             after_date, "%Y-%m-%d"
         ).timestamp()
 
-        while next_page_url is not None:
+        while next_page_url is not None:   # <-- generator for fetching ads 1by1
             response = requests.get(next_page_url)
             response_data = json.loads(response.text)
             if "error" in response_data:
